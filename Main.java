@@ -17,10 +17,10 @@ public class Main {
             Document document = Jsoup.connect(url).get();
 
             // Select and scrape data
-            Elements statRows = document.select("table.stats-table tr"); // Assuming stats are in table rows
+            Elements statRows = document.select("table.stats-table tr");
 
             for (Element row : statRows) {
-                Elements columns = row.select("td"); // Assuming stats are in table data cells
+                Elements columns = row.select("td"); 
                 if (columns.size() >= 3) { // Check if it's a valid data row
                     String playerName = columns.get(0).text();
                     String team = columns.get(1).text();
