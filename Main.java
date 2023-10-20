@@ -5,31 +5,36 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
         // URL of the MLB stats page
-        String url = "https://www.mlb.com/stats/";
+        String url = "https://www.mlb.com/stats";
 
         try {
             // Connect to the website and fetch the HTML content
             Document document = Jsoup.connect(url).get();
 
             // Select and scrape data
-            Elements statRows = document.select("table.stats-table tr");
+            if (document != null) {
+                Elements rows = document.select("tr"); // Assuming the columns are within table rows
 
-            for (Element row : statRows) {
-                Elements columns = row.select("td"); 
-                if (columns.size() >= 3) { // Check if it's a valid data row
-                    String playerName = columns.get(0).text();
-                    String team = columns.get(1).text();
-                    String statValue = columns.get(2).text();
+                int printCounter = 0; // Initialize a counter
 
-                    System.out.println("Player: " + playerName);
-                    System.out.println("Team: " + team);
-                    System.out.println("Stat: " + statValue);
-                    System.out.println();
+                for (Element row : rows) {
+                    Elements columns = row.select("td"); // Assuming the columns are represented by <td> elements
+
+                    for (Element column : columns) {
+                        // Extract the data from the current column
+                        String columnData = column.text();
+                        System.out.print(columnData); // Print the data without a new line
+                        printCounter++;
+
+                        if (printCounter % 17 == 0) {
+                            System.out.println(); // Insert a new line after every 16 elements
+                        } else {
+                            System.out.print("\t"); // Add a tab between elements within the same row
+                        }
+                    }
                 }
             }
 
