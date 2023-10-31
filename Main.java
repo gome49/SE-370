@@ -60,7 +60,7 @@ public class Main {
         JScrollPane scrollPane = new JScrollPane(textArea);
 
         // Create a JButton to fetch and display the stats
-        JButton fetchButton = new JButton("Fetch MLB Stats");
+        JButton fetchButton = new JButton("Fetch Hitting Stats");
         fetchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,12 +68,24 @@ public class Main {
                 textArea.setText(stats);
             }
         });
+        // Create a JButton to fetch and display the pitching stats
+        JButton fetchPitchingButton = new JButton("Fetch Pitching Stats");
+        fetchPitchingButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String stats = fetchPitchingStats();
+                textArea.setText(stats);
+            }
+        });
+
 
         // Create a JButton to switch to the Top Players panel
         JButton topPlayersButton = new JButton("Top Players");
         topPlayersButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String stats = fetchPitchingStats();
+                textArea.setText(stats);
                 cardLayout.show(mainPanel, "TopPlayersPanel");
             }
         });
@@ -82,6 +94,7 @@ public class Main {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(fetchButton);
         buttonPanel.add(topPlayersButton);
+        buttonPanel.add(fetchPitchingButton);
 
         // Create a JPanel to hold the column names and text area
         JPanel statsPanel = new JPanel(new BorderLayout());
@@ -142,4 +155,35 @@ public class Main {
 
         return stats.toString();
     }
+    private static String fetchPitchingStats() {
+        StringBuilder stats = new StringBuilder();
+        // URL for pitching stats
+        String url = "https://www.mlb.com/stats/pitching?sortState=asc"; // Replace with the actual URL
+
+        try {
+            // Connect to the website and fetch the HTML content
+            Document document = Jsoup.connect(url).get();
+
+            // Select and scrape data
+            if (document != null) {
+                Elements rows = document.select("tr"); // Assuming the columns are within table rows
+
+                for (Element row : rows) {
+                    Elements columns = row.select("td"); // Assuming the columns are represented by <td> elements
+
+                    for (Element column : columns) {
+                        // Extract the data from the current column
+                        String columnData = column.text();
+                        stats.append(columnData).append("\t"); // Separate elements with tabs
+                    }
+                    stats.append("\n"); // Add a new line after each row
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return stats.toString();
+    }
+
 }
