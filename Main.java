@@ -60,7 +60,7 @@ public class Main {
         JScrollPane scrollPane = new JScrollPane(textArea);
 
         // Create a JButton to fetch and display the stats
-        JButton fetchButton = new JButton("Fetch Hitting Stats");
+        JButton fetchButton = new JButton("Player Hitting Stats");
         fetchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,7 +69,7 @@ public class Main {
             }
         });
         // Create a JButton to fetch and display the pitching stats
-        JButton fetchPitchingButton = new JButton("Fetch Pitching Stats");
+        JButton fetchPitchingButton = new JButton("Player Pitching Stats");
         fetchPitchingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -78,6 +78,15 @@ public class Main {
             }
         });
 
+        // Create a JButton to switch to the Top Players panel
+        JButton fetchHittingStatsTeam = new JButton("Team Hitting Stats");
+        fetchHittingStatsTeam.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String stats = fetchHittingStatsTeam();
+                textArea.setText(stats);
+            }
+        });
 
         // Create a JButton to switch to the Top Players panel
         JButton topPlayersButton = new JButton("Top Players");
@@ -89,12 +98,22 @@ public class Main {
                 cardLayout.show(mainPanel, "TopPlayersPanel");
             }
         });
+        JButton teamPitchingStats = new JButton("Team Pitching Stats");
+        teamPitchingStats.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String stats = fetchPitchingStats();
+                textArea.setText(stats);
+            }
+        });
 
         // Create a JPanel to hold the buttons
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(fetchButton);
         buttonPanel.add(topPlayersButton);
         buttonPanel.add(fetchPitchingButton);
+        buttonPanel.add(fetchHittingStatsTeam);
+        buttonPanel.add(teamPitchingStats);
 
         // Create a JPanel to hold the column names and text area
         JPanel statsPanel = new JPanel(new BorderLayout());
@@ -159,6 +178,66 @@ public class Main {
         StringBuilder stats = new StringBuilder();
         // URL for pitching stats
         String url = "https://www.mlb.com/stats/pitching?sortState=asc"; // Replace with the actual URL
+
+        try {
+            // Connect to the website and fetch the HTML content
+            Document document = Jsoup.connect(url).get();
+
+            // Select and scrape data
+            if (document != null) {
+                Elements rows = document.select("tr"); // Assuming the columns are within table rows
+
+                for (Element row : rows) {
+                    Elements columns = row.select("td"); // Assuming the columns are represented by <td> elements
+
+                    for (Element column : columns) {
+                        // Extract the data from the current column
+                        String columnData = column.text();
+                        stats.append(columnData).append("\t"); // Separate elements with tabs
+                    }
+                    stats.append("\n"); // Add a new line after each row
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return stats.toString();
+    }
+    private static String fetchHittingStatsTeam() {
+        StringBuilder stats = new StringBuilder();
+        // URL for pitching stats
+        String url = "https://www.mlb.com/stats/team"; // Replace with the actual URL
+
+        try {
+            // Connect to the website and fetch the HTML content
+            Document document = Jsoup.connect(url).get();
+
+            // Select and scrape data
+            if (document != null) {
+                Elements rows = document.select("tr"); // Assuming the columns are within table rows
+
+                for (Element row : rows) {
+                    Elements columns = row.select("td"); // Assuming the columns are represented by <td> elements
+
+                    for (Element column : columns) {
+                        // Extract the data from the current column
+                        String columnData = column.text();
+                        stats.append(columnData).append("\t"); // Separate elements with tabs
+                    }
+                    stats.append("\n"); // Add a new line after each row
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return stats.toString();
+    }
+    private static String teamPitchingStats() {
+        StringBuilder stats = new StringBuilder();
+        // URL for pitching stats
+        String url = "https://www.mlb.com/stats/team/pitching?sortState=asc"; // Replace with the actual URL
 
         try {
             // Connect to the website and fetch the HTML content
